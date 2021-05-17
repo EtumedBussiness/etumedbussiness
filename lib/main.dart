@@ -11,6 +11,7 @@ import 'package:flutter_signin_button/button_builder.dart';
 
 import './register_page.dart';
 import './signin_page.dart';
+import './profile.dart';
 
 // Requires that the Firebase Auth emulator is running locally
 // e.g via `melos run firebase:emulator`.
@@ -73,6 +74,16 @@ class AuthTypeSelector extends StatelessWidget {
               backgroundColor: Colors.orange,
               text: 'Sign In',
               onPressed: () => _pushPage(context, SignInPage()),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.all(16),
+            alignment: Alignment.center,
+            child: SignInButtonBuilder(
+              icon: Icons.supervised_user_circle,
+              backgroundColor: Colors.green,
+              text: 'Profile',
+              onPressed: () => _pushPage(context, ProfilePage()),
             ),
           ),
         ],
