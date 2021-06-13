@@ -1,42 +1,57 @@
-// Copyright 2021 The Etumed Bussiness Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
-//import 'package:etumedbussiness/homepage.dart';
-import 'package:etumedbussiness/pages/homepage.dart';
-import 'package:etumedbussiness/pages/signup.dart';
-import 'package:etumedbussiness/pages/signin.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:EtumedBusiness/components/life_cycle_event_handler.dart';
+import 'package:EtumedBusiness/landing/landing_page.dart';
+import 'package:EtumedBusiness/screens/mainscreen.dart';
+import 'package:EtumedBusiness/services/user_service.dart';
+import 'package:EtumedBusiness/utils/config.dart';
+import 'package:EtumedBusiness/utils/constants.dart';
+import 'package:EtumedBusiness/utils/providers.dart';
 
-// Requires that the Firebase Auth emulator is running locally
-// e.g via `melos run firebase:emulator`.
-Future<void> main() async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  await FirebaseAuth.instance.useEmulator('http://localhost:9099');
-  runApp(AuthExampleApp());
+  await Config.initFirebase();
+  runApp(MyApp());
 }
 
-/// The entry point of the application.
-///
-/// Returns a [MaterialApp].
-class AuthExampleApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(LifecycleEventHandler(
+      detachedCallBack: () => UserService().setUserStatus(false),
+      resumeCallBack: () => UserService().setUserStatus(true),
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Etumed App',
-      theme: ThemeData.dark(),
-      home: Scaffold(
-        body: SignIn(),
+    return MultiProvider(
+      providers: providers,
+      child: Consumer<ThemeNotifier>(
+        builder: (context, ThemeNotifier notifier, child) {
+          return MaterialApp(
+            title: Constants.appName,
+            debugShowCheckedModeBanner: false,
+            theme:notifier.dark ? Constants.darkTheme : Constants.lightTheme,
+            home: StreamBuilder(
+              stream: FirebaseAuth.instance.authStateChanges(),
+              builder: (BuildContext context, AsyncSnapshot<User> snapshot) {
+                if (snapshot.hasData) {
+                  return TabScreen();
+                } else
+                  return Landing();
+              },
+            ),
+          );
+        },
       ),
-      routes: {
-//        "/homepage": (_) => HomePage(),
-        '/signin': (_) => SignIn(),
-        '/signup': (_) => SignUp(),
-        '/main': (_) => HomePage(),
-      },
     );
   }
 }
