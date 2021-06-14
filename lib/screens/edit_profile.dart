@@ -79,28 +79,28 @@ class _EditProfileState extends State<EditProfile> {
                   ),
                   child: viewModel.imgLink != null
                       ? Padding(
-                          padding: const EdgeInsets.all(1.0),
-                          child: CircleAvatar(
-                            radius: 65.0,
-                            backgroundImage: NetworkImage(viewModel.imgLink),
-                          ),
-                        )
+                    padding: const EdgeInsets.all(1.0),
+                    child: CircleAvatar(
+                      radius: 65.0,
+                      backgroundImage: NetworkImage(viewModel.imgLink),
+                    ),
+                  )
                       : viewModel.image == null
-                          ? Padding(
-                              padding: const EdgeInsets.all(1.0),
-                              child: CircleAvatar(
-                                radius: 65.0,
-                                backgroundImage:
-                                    NetworkImage(widget.user.photoUrl),
-                              ),
-                            )
-                          : Padding(
-                              padding: const EdgeInsets.all(1.0),
-                              child: CircleAvatar(
-                                radius: 65.0,
-                                backgroundImage: FileImage(viewModel.image),
-                              ),
-                            ),
+                      ? Padding(
+                    padding: const EdgeInsets.all(1.0),
+                    child: CircleAvatar(
+                      radius: 65.0,
+                      backgroundImage:
+                      NetworkImage(widget.user.photoUrl),
+                    ),
+                  )
+                      : Padding(
+                    padding: const EdgeInsets.all(1.0),
+                    child: CircleAvatar(
+                      radius: 65.0,
+                      backgroundImage: FileImage(viewModel.image),
+                    ),
+                  ),
                 ),
               ),
             ),

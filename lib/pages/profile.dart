@@ -54,22 +54,22 @@ class _ProfileState extends State<Profile>  {
         actions: [
           widget.profileId == firebaseAuth.currentUser.uid
               ? Center(
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 25.0),
-                    child: GestureDetector(
-                      onTap: () {
-                        firebaseAuth.signOut();
-                        Navigator.of(context).push(
-                            CupertinoPageRoute(builder: (_) => Register()));
-                      },
-                      child: Text(
-                        'Log Out',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w900, fontSize: 15.0),
-                      ),
-                    ),
-                  ),
-                )
+            child: Padding(
+              padding: const EdgeInsets.only(right: 25.0),
+              child: GestureDetector(
+                onTap: () {
+                  firebaseAuth.signOut();
+                  Navigator.of(context).push(
+                      CupertinoPageRoute(builder: (_) => Register()));
+                },
+                child: Text(
+                  'Log Out',
+                  style: TextStyle(
+                      fontWeight: FontWeight.w900, fontSize: 15.0),
+                ),
+              ),
+            ),
+          )
               : SizedBox()
         ],
       ),

@@ -53,6 +53,10 @@ dependencies:
   image_cropper: any
   shared_preferences: any
   data_connection_checker: any
+  dio: any
+  linkedin_login: any
+  flutter_json_widget: any
+
 
 dependency_overrides:
   path_provider: ^2.0.0-nullsafety.1

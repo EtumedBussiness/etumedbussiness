@@ -29,7 +29,7 @@ class UserModel {
         this.occupation,
         this.department,
       }
-  );
+      );
 
   UserModel.fromJson(Map<String, dynamic> json) {
     username = json['username'];

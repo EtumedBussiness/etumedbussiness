@@ -2,13 +2,36 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:EtumedBusiness/auth/login/login.dart';
 import 'package:EtumedBusiness/auth/register/register.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter_json_widget/flutter_json_widget.dart';
+import 'package:linkedin_login/linkedin_login.dart';
+import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
+
+
+
+
+
 
 class Landing extends StatefulWidget {
+  Landing({Key key, this.title}) : super(key: key);
+
+  final String title;
+
   @override
   _LandingState createState() => _LandingState();
 }
 
 class _LandingState extends State<Landing> {
+
+  String redirectUrl = "https://www.google.com";
+  String clientId = "86y4aqeoqa4ryj"; /// Your linkedin client id
+  String clientSecret = "z2N314FU3LoniuVJ"; /// Your linkedin client secret
+  Dio dio = Dio();
+  Map<String, dynamic> resultslinkedin;
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,6 +50,7 @@ class _LandingState extends State<Landing> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+
             Align(
               alignment: Alignment.center,
               child: Padding(
@@ -46,17 +70,24 @@ class _LandingState extends State<Landing> {
                 fontWeight: FontWeight.w900,
                 fontFamily: 'Ubuntu-Regular',
               ),
-            )
+            ),
+            SizedBox(height: 50,),
+            LinkedInButtonStandardWidget(
+                onTap: linkedInLogin
+            ),
+            resultslinkedin != null && resultslinkedin.isNotEmpty
+                ? CachedNetworkImage(imageUrl: resultslinkedin["pic_url"])
+                : Text(""),
+            resultslinkedin != null && resultslinkedin.isNotEmpty
+                ? JsonViewerWidget(resultslinkedin)
+                : Text("")
           ],
         ),
       ),
       bottomNavigationBar: BottomAppBar(
 
-
-
         elevation: 0.0,
         child: Container(
-
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
@@ -68,8 +99,10 @@ class _LandingState extends State<Landing> {
           child: Padding(
             padding: const EdgeInsets.only(left: 10.0, right: 20.0, bottom: 20.0,top: 20.0),
             child: Row(
+
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+
                 GestureDetector(
                   onTap: () {
                     Navigator.of(context).pushReplacement(
@@ -139,6 +172,52 @@ class _LandingState extends State<Landing> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  linkedInLogin() async{
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (BuildContext context) =>
+            LinkedInUserWidget(
+              appBar: AppBar(
+                title: Text("Sign-in with Linkedin"),
+              ),
+              redirectUrl: redirectUrl,
+              clientId: clientId,
+              clientSecret: clientSecret,
+                onGetUserProfile: (LinkedInUserModel linkedInUser) async{
+                /// This api call retrives profile picture
+                Response response = await dio.get(
+                    "https://api.linkedin.com/v2/me?projection=(profilePicture(displayImage~:playableStreams))",
+                    options: Options(
+                        responseType: ResponseType.json,
+                        sendTimeout: 60000,
+                        receiveTimeout: 60000,
+                        headers: {
+                          HttpHeaders.authorizationHeader: "Bearer ${linkedInUser.token.accessToken}"
+                        }
+                    )
+                );
+                var profilePic = response.data["profilePicture"]["displayImage~"]["elements"][0]["identifiers"][0]["identifier"];
+
+                Map<String, dynamic> postJson = {
+                  "email": linkedInUser.email.elements[0].handleDeep.emailAddress,
+                  "pic_url": profilePic,
+                  "name": linkedInUser.firstName.localized.label + ' ' + linkedInUser.lastName.localized.label,
+                };
+                setState(() {
+                  resultslinkedin = postJson;
+                });
+                Navigator.of(context).pop();
+              },
+              catchError: (LinkedInErrorObject error) {
+                print('Error description: ${error.description} Error code: ${error.statusCode.toString()}');
+              },
+            ),
+        fullscreenDialog: true,
       ),
     );
   }
