@@ -69,6 +69,7 @@ class UserPost extends StatelessWidget {
                           child: Row(
                             children: [
                               buildLikeButton(),
+                              buildDeleteButton(),
                               InkWell(
                                 borderRadius: BorderRadius.circular(10.0),
                                 onTap: () {
@@ -201,6 +202,20 @@ class UserPost extends StatelessWidget {
         }
         return Container();
       },
+    );
+  }
+
+  buildDeleteButton() {
+    if(currentUserId() != post.ownerId)
+      return Container();
+
+    return IconButton(
+      onPressed: () {
+        postRef.doc(post.postId).delete();
+      },
+      icon: Icon(
+        CupertinoIcons.trash,
+      ),
     );
   }
 
