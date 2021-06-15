@@ -208,9 +208,6 @@ class _LandingState extends State<Landing> {
                   ' ' +
                   linkedInUser.lastName.localized.label,
             };
-            setState(() {
-              resultslinkedin = postJson;
-            });
 
             try {
               await auth.loginUser(
