@@ -7,8 +7,12 @@ import 'package:flutter_json_widget/flutter_json_widget.dart';
 import 'package:linkedin_login/linkedin_login.dart';
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:EtumedBusiness/services/auth_service.dart';
-import 'package:EtumedBusiness/screens/mainscreen.dart';
+
+
+
+
+
+
 class Landing extends StatefulWidget {
   Landing({Key key, this.title}) : super(key: key);
 
@@ -21,16 +25,11 @@ class Landing extends StatefulWidget {
 class _LandingState extends State<Landing> {
 
   String redirectUrl = "https://www.google.com";
-  String clientId = "86y4aqeoqa4ryj";
-
-  /// Your linkedin client id
-  String clientSecret = "z2N314FU3LoniuVJ";
-
-  /// Your linkedin client secret
+  String clientId = "86y4aqeoqa4ryj"; /// Your linkedin client id
+  String clientSecret = "z2N314FU3LoniuVJ"; /// Your linkedin client secret
   Dio dio = Dio();
   Map<String, dynamic> resultslinkedin;
 
-  AuthService auth = AuthService();
 
 
   @override
@@ -51,6 +50,7 @@ class _LandingState extends State<Landing> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+
             Align(
               alignment: Alignment.center,
               child: Padding(
@@ -85,6 +85,7 @@ class _LandingState extends State<Landing> {
         ),
       ),
       bottomNavigationBar: BottomAppBar(
+
         elevation: 0.0,
         child: Container(
           decoration: const BoxDecoration(
@@ -101,6 +102,7 @@ class _LandingState extends State<Landing> {
 
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+
                 GestureDetector(
                   onTap: () {
                     Navigator.of(context).pushReplacement(
