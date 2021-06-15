@@ -9,6 +9,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:EtumedBusiness/services/auth_service.dart';
 import 'package:EtumedBusiness/screens/mainscreen.dart';
+
 class Landing extends StatefulWidget {
   Landing({Key key, this.title}) : super(key: key);
 
@@ -19,7 +20,6 @@ class Landing extends StatefulWidget {
 }
 
 class _LandingState extends State<Landing> {
-
   String redirectUrl = "https://www.google.com";
   String clientId = "86y4aqeoqa4ryj";
 
@@ -32,7 +32,6 @@ class _LandingState extends State<Landing> {
 
   AuthService auth = AuthService();
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,8 +39,8 @@ class _LandingState extends State<Landing> {
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
-            end:
-            Alignment(0.8, 0.0), // 10% of the width, so there are ten blinds.
+            end: Alignment(
+                0.8, 0.0), // 10% of the width, so there are ten blinds.
             colors: [Colors.red, Colors.black],
             tileMode: TileMode.repeated, // repeats the gradient over the canvas
           ),
@@ -71,10 +70,10 @@ class _LandingState extends State<Landing> {
                 fontFamily: 'Ubuntu-Regular',
               ),
             ),
-            SizedBox(height: 50,),
-            LinkedInButtonStandardWidget(
-                onTap: linkedInLogin
+            SizedBox(
+              height: 50,
             ),
+            LinkedInButtonStandardWidget(onTap: linkedInLogin),
             resultslinkedin != null && resultslinkedin.isNotEmpty
                 ? CachedNetworkImage(imageUrl: resultslinkedin["pic_url"])
                 : Text(""),
@@ -90,15 +89,17 @@ class _LandingState extends State<Landing> {
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
-              end: Alignment(0.0, 0), // 10% of the width, so there are ten blinds.
+              end: Alignment(
+                  0.0, 0), // 10% of the width, so there are ten blinds.
               colors: [Colors.red, Colors.black],
-              tileMode: TileMode.repeated, // repeats the gradient over the canvas
+              tileMode:
+                  TileMode.repeated, // repeats the gradient over the canvas
             ),
           ),
           child: Padding(
-            padding: const EdgeInsets.only(left: 10.0, right: 20.0, bottom: 20.0,top: 20.0),
+            padding: const EdgeInsets.only(
+                left: 10.0, right: 20.0, bottom: 20.0, top: 20.0),
             child: Row(
-
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 GestureDetector(
@@ -174,47 +175,68 @@ class _LandingState extends State<Landing> {
     );
   }
 
-  linkedInLogin() async{
+  linkedInLogin() async {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (BuildContext context) =>
-            LinkedInUserWidget(
-              appBar: AppBar(
-                title: Text("Sign-in with Linkedin"),
-              ),
-              redirectUrl: redirectUrl,
-              clientId: clientId,
-              clientSecret: clientSecret,
-                onGetUserProfile: (LinkedInUserModel linkedInUser) async{
-                /// This api call retrives profile picture
-                Response response = await dio.get(
-                    "https://api.linkedin.com/v2/me?projection=(profilePicture(displayImage~:playableStreams))",
-                    options: Options(
-                        responseType: ResponseType.json,
-                        sendTimeout: 60000,
-                        receiveTimeout: 60000,
-                        headers: {
-                          HttpHeaders.authorizationHeader: "Bearer ${linkedInUser.token.accessToken}"
-                        }
-                    )
-                );
-                var profilePic = response.data["profilePicture"]["displayImage~"]["elements"][0]["identifiers"][0]["identifier"];
+        builder: (BuildContext context) => LinkedInUserWidget(
+          appBar: AppBar(
+            title: Text("Sign-in with Linkedin"),
+          ),
+          redirectUrl: redirectUrl,
+          clientId: clientId,
+          clientSecret: clientSecret,
+          onGetUserProfile: (LinkedInUserModel linkedInUser) async {
+            /// This api call retrives profile picture
+            Response response = await dio.get(
+                "https://api.linkedin.com/v2/me?projection=(profilePicture(displayImage~:playableStreams))",
+                options: Options(
+                    responseType: ResponseType.json,
+                    sendTimeout: 60000,
+                    receiveTimeout: 60000,
+                    headers: {
+                      HttpHeaders.authorizationHeader:
+                          "Bearer ${linkedInUser.token.accessToken}"
+                    }));
+            var profilePic = response.data["profilePicture"]["displayImage~"]
+                ["elements"][0]["identifiers"][0]["identifier"];
 
-                Map<String, dynamic> postJson = {
-                  "email": linkedInUser.email.elements[0].handleDeep.emailAddress,
-                  "pic_url": profilePic,
-                  "name": linkedInUser.firstName.localized.label + ' ' + linkedInUser.lastName.localized.label,
-                };
-                setState(() {
-                  resultslinkedin = postJson;
-                });
-                Navigator.of(context).pop();
-              },
-              catchError: (LinkedInErrorObject error) {
-                print('Error description: ${error.description} Error code: ${error.statusCode.toString()}');
-              },
-            ),
+            Map<String, dynamic> postJson = {
+              "email": linkedInUser.email.elements[0].handleDeep.emailAddress,
+              "pic_url": profilePic,
+              "name": linkedInUser.firstName.localized.label +
+                  ' ' +
+                  linkedInUser.lastName.localized.label,
+            };
+
+            try {
+              await auth.loginUser(
+                email: postJson["email"].toString(),
+                password: "123456",
+              );
+              Navigator.of(context).pushReplacement(
+                  CupertinoPageRoute(builder: (_) => TabScreen()));
+            } catch (e) {
+              bool success = await auth.createUser(
+                name: postJson["name"].toString(),
+                email: postJson["email"].toString(),
+                password: "123456",
+                country: "Not given",
+              );
+
+              if (success) {
+                Navigator.of(context).pushReplacement(
+                    CupertinoPageRoute(builder: (_) => TabScreen()));
+              }
+            }
+
+            Navigator.of(context).pop();
+          },
+          catchError: (LinkedInErrorObject error) {
+            print(
+                'Error description: ${error.description} Error code: ${error.statusCode.toString()}');
+          },
+        ),
         fullscreenDialog: true,
       ),
     );
